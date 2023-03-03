@@ -7,6 +7,8 @@ const Navbar = () => {
 
     const handleLogOut = () => {
         logOut()
+            .then(() => { })
+            .catch((error) => console.error(error));
     }
 
     const menuItems =
@@ -14,10 +16,12 @@ const Navbar = () => {
             <li><Link to='/'>Home</Link></li>
             <li><Link to='/about'>About</Link></li>
             <li><Link to='/appointment'>Appointment</Link></li>
-            <li><Link to='/review'>Reviews</Link></li>
             <li><Link to='/contact'>Contact Us</Link></li>
             {user?.uid ?
-                <button className='btn btn-ghost' onClick={handleLogOut}>Sign Out</button>
+                <>
+                    <li><Link to='/dashboard'>Dashboard</Link></li>
+                    <li><button onClick={handleLogOut}>Sign Out</button></li>
+                </>
                 : <li><Link to='/login'>Login</Link></li>}
         </>
 

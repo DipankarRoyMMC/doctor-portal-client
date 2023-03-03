@@ -9,10 +9,11 @@ const Login = () => {
     const [loginError, setLoginError] = useState('');
 
     const handleLogin = (data) => {
+        setLoginError("");
         signIn(data.email, data.password)
             .then(result => {
                 const user = result.user;
-                console.log(user)
+                console.log(user);
             })
             .catch(error => {
                 setLoginError(error.message)

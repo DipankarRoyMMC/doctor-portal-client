@@ -1,19 +1,36 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthProvider';
 
 const Register = () => {
     const { register, formState: { errors }, handleSubmit, reset } = useForm();
-    const { createUser } = useContext(AuthContext);
+    const { createUser, updateUser } = useContext(AuthContext);
+    const [registerError, setRegisterError] = useState('');
 
     const handleRegister = (data) => {
+        setRegisterError(' ');
         createUser(data.email, data.password)
             .then((result) => {
                 const user = result.user;
-                console.log(user)
+                console.log(user);
+
+                toast("User Created Successfully");
+
+                // update userInfo code
+                const userInfo = {
+                    displayName: data.name
+                }
+                updateUser(userInfo)
+                    .then(() => { })
+                    .catch(error => console.error(error))
+
             })
-            .catch((error) => console.error(error))
+            .catch((error) => {
+                console.error(error.message)
+                setRegisterError(error.message)
+            })
 
         reset();
     }
@@ -47,7 +64,7 @@ const Register = () => {
                         },
                         pattern: {
                             value: /(?=.*[A-Z])(?=.*[!@#$&*])(?=.*[0-9])(?=.*[a-z])/,
-                            message: "Password must be strength"
+                            message: "Password must be uppercase, lowercase, special character, and number"
                         }
                     })} type="password" className="input input-bordered w-full" />
                     <p className='text-red-600'>{errors.password && errors.password.message}</p>
@@ -56,6 +73,7 @@ const Register = () => {
                         <span className="label-text-alt">Forgot password?</span>
                     </label>
                     <input type="submit" className='btn w-full' value="Register" />
+                    {registerError && <p className='text-red-600'>{registerError}</p>}
 
                     <div>
                         <p className='text-sm my-3'>Already Have an Account? <Link to='/login' className='text-secondary '>Please Login</Link></p>
