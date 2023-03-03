@@ -1,11 +1,23 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../../contexts/AuthProvider';
 
 const Login = () => {
     const { register, formState: { errors }, handleSubmit, reset } = useForm();
+    const { signIn } = useContext(AuthContext);
+    const [loginError, setLoginError] = useState('');
+
     const handleLogin = (data) => {
-        console.log(data);
+        signIn(data.email, data.password)
+            .then(result => {
+                const user = result.user;
+                console.log(user)
+            })
+            .catch(error => {
+                setLoginError(error.message)
+            })
+
         reset();
     }
 
@@ -18,7 +30,6 @@ const Login = () => {
                     <label className='label-text' htmlFor="email">
                         <span className="label-text">Email</span>
                     </label>
-                    {/* email input field */}
                     <input {...register("email", { required: "Required this field" })}
                         type="email" className="input input-bordered w-full" />
                     <p className='text-red-600'>{errors.email && errors.email.message}</p>
@@ -26,17 +37,19 @@ const Login = () => {
                     <label className="label">
                         <span className="label-text">Password</span>
                     </label>
-                    {/* password input field  */}
                     <input {...register("password", {
                         required: true, minLength: {
                             value: 6, message: "Password min 6 character"
                         }
                     })} type="password" className="input input-bordered w-full" />
                     <p className='text-red-600'>{errors.password && errors.password.message}</p>
+
                     <label className="label">
                         <span className="label-text-alt">Forgot password?</span>
                     </label>
                     <input type="submit" className='btn w-full' value="Login" />
+                    {loginError && <p className='text-red-600'>{loginError}</p>}
+
                     <div>
                         <p className='text-sm my-3'>New to Doctor portal? <Link to='/register' className='text-secondary '>Create new account</Link></p>
                         <div className="divider my-3">OR</div>
