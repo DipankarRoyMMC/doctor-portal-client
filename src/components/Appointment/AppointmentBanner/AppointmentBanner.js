@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import { DayPicker } from 'react-day-picker';
 import chair from '../../../assets/images/chair.png';
 
