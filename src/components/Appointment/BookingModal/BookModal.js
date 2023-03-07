@@ -1,9 +1,9 @@
 import { format } from 'date-fns';
-import React, { useContext, useEffect, } from 'react';
+import React, { useContext } from 'react';
 import { toast } from 'react-hot-toast';
 import { AuthContext } from '../../../contexts/AuthProvider';
 
-const BookModal = ({ treatment, setTreatment, selectedDate }) => {
+const BookModal = ({ treatment, setTreatment, selectedDate, refetch }) => {
     const { name, slots } = treatment;
     const date = format(selectedDate, 'PP');
     const { user } = useContext(AuthContext)
@@ -26,6 +26,7 @@ const BookModal = ({ treatment, setTreatment, selectedDate }) => {
             slot
         }
 
+
         fetch('http://localhost:5000/booking', {
             method: 'POST',
             headers: {
@@ -37,8 +38,11 @@ const BookModal = ({ treatment, setTreatment, selectedDate }) => {
             .then(data => {
                 console.log(data);
                 if (data.acknowledged) {
-                    toast.success('Booking Successfully!!!')
+                    toast.success('Booking Successfully!!!');
+                    refetch();
                     setTreatment(null);
+                } else {
+                    toast.error(data.message)
                 }
 
             })
