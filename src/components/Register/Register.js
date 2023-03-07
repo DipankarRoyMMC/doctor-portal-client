@@ -18,25 +18,40 @@ const Register = () => {
                 console.log(user);
 
                 toast("User Created Successfully");
-
                 // update userInfo code
                 const userInfo = {
                     displayName: data.name
                 }
                 updateUser(userInfo)
                     .then(() => {
-                        navigate('/');
-
+                        saveUser(data.name, data.email);
                     })
                     .catch(error => console.error(error));
-
             })
             .catch((error) => {
                 console.error(error.message)
                 setRegisterError(error.message)
             })
-
         reset();
+
+        const saveUser = (name, email) => {
+            const user = { name, email }
+            fetch('http://localhost:5000/users', {
+                method: "POST",
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data);
+                    navigate('/');
+                })
+        }
+
+
+
     }
 
     return (
