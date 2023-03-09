@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { useQueries, useQuery } from 'react-query';
+import { useQuery } from 'react-query';
 import { AuthContext } from '../../../contexts/AuthProvider';
 
 const MyAppointment = () => {
@@ -9,7 +9,12 @@ const MyAppointment = () => {
     const { data: bookings = [] } = useQuery({
         queryKey: ['bookings', user?.email],
         queryFn: async () => {
-            const res = await fetch(url);
+            const res = await fetch(url, {
+                // get accesstoken from local storage 
+                headers: {
+                    authorization: `bearer ${localStorage.getItem('accessToken')}`
+                }
+            });
             const data = res.json();
             return data;
         }
