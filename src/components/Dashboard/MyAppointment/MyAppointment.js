@@ -10,12 +10,11 @@ const MyAppointment = () => {
         queryKey: ['bookings', user?.email],
         queryFn: async () => {
             const res = await fetch(url, {
-                // get accesstoken from local storage 
                 headers: {
                     authorization: `bearer ${localStorage.getItem('accessToken')}`
                 }
             });
-            const data = res.json();
+            const data = await res.json();
             return data;
         }
     });
