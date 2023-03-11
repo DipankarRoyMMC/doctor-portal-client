@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { useQuery } from 'react-query';
+import ConfirmationModal from '../../Shared/ConfirmationModal/ConfirmationModal';
 
 const ManageDoctor = () => {
-    const { data: doctors, isLoading } = useQuery({
+    const [deletingDoctor, setDeletingDoctor] = useState(null);
+    const closeModal = () => {
+        setDeletingDoctor(null);
+    }
+
+    const { data: doctors, isLoading, refetch } = useQuery({
         queryKey: ['doctors'],
         queryFn: async () => {
             try {
@@ -19,6 +26,24 @@ const ManageDoctor = () => {
             }
         }
     });
+
+    const handleDeleteDoctor = doctor => {
+        fetch(`http://localhost:5000/doctors/${doctor._id}`, {
+            method: 'DELETE',
+            headers: {
+                authorization: `bearer ${localStorage.getItem('accessToken')}`
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.deletedCount > 0) {
+                    refetch();
+                    toast.success(`Deleted ${doctor.name} is successfully!`)
+                }
+
+            })
+    }
+
     if (isLoading) {
         return <div>Loading..</div>
     }
@@ -40,7 +65,7 @@ const ManageDoctor = () => {
                     </thead>
                     <tbody>
                         {
-                            doctors.map((doctor, i) => <tr key={doctor._id}>
+                            doctors?.map((doctor, i) => <tr key={doctor._id}>
                                 <th>{i + 1}</th>
                                 <td>
                                     <div className="avatar">
@@ -52,12 +77,23 @@ const ManageDoctor = () => {
                                 <td>{doctor.name}</td>
                                 <td>{doctor.email}</td>
                                 <td>{doctor.specialty}</td>
-                                <td><button className='btn btn-error btn-xs'>Delete</button></td>
+                                <td>
+                                    <label onClick={() => setDeletingDoctor(doctor)} htmlFor="confirmation-modal" className="btn btn-error btn-sm">Delete</label>
+                                </td>
                             </tr>)
                         }
                     </tbody>
                 </table>
             </div>
+
+            {deletingDoctor &&
+                <ConfirmationModal
+                    title={`Are you sure delete this Doctor`}
+                    message={`If you delete this ${deletingDoctor.name} you couldn't recovery this doctor.`}
+                    successAction={handleDeleteDoctor}
+                    modalData={deletingDoctor}
+                    closeModal={closeModal}
+                ></ConfirmationModal>}
         </div >
     );
 };
